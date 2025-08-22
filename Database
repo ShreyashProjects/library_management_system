@@ -1,1 +1,83 @@
 
+use inventory_management_system;
+create table Roles(R_id int primary key auto_increment,role_name varchar(50),created_at timestamp);
+create table fuel_types(fuel_id int primary key,fuelType_name varchar(50),created_at timestamp);
+create table payments(payment_id int primary key,payment_type varchar(50),created_at timestamp);
+create table customers(customer_id int primary key,name varchar(100),contact_number varchar(20),email varchar(100),address varchar(100),created_at timestamp);
+create table suppliers(supplier_id int primary key,supplier_name varchar(100),contact_person varchar(100),contact_number varchar(20),email varchar(100),address varchar(100),created_at timestamp);
+create table purchase_orders(order_id int primary key,supplier_id int,order_date timestamp,total_amount decimal(10,2),order_status varchar(20),foreign key(supplier_id) references suppliers(supplier_id));
+
+create table users(user_id int primary key,username varchar(50),password_hash varchar(255),role_id int,created_at timestamp,foreign key(role_id) references Roles(R_id));
+create table vehicles(vehicle_id int primary key,model_name varchar(100),brand varchar(50),variant varchar(50),fuel_id int,price decimal(10,2),stock_quantity int,created_at timestamp,foreign key(fuel_id) references fuel_types(fuel_id));
+create table spare_parts(part_id int primary key,part_name varchar(100),part_number varchar(50),stock_quantity int,reorder_level int,supplier_id int,created_at timestamp,foreign key(supplier_id) references suppliers(supplier_id));
+
+create table sales(sale_id int primary key,customer_id int,vehicle_id int,sale_date timestamp,quantity int,total_price decimal(10,2),payment_id int,foreign key(vehicle_id) references vehicles(vehicle_id),foreign key(payment_id) references payments(payment_id),foreign key(customer_id) references customers(customer_id));
+create table spare_parts_sales(sale_id int primary key,customer_id int,part_id int,sale_date timestamp,quantity int,total_price decimal(10,2),foreign key(part_id) references spare_parts(part_id),foreign key (customer_id) references customers(customer_id));
+create table invoices(invoice_id int primary key,order_id int,sale_id int,issue_date timestamp,amount decimal(10,2),payment_status varchar(50),foreign key(sale_id) references sales(sale_id),foreign key(order_id) references purchase_orders(order_id));
+
+create table stock_transactions(transaction_id int primary key,item_type varchar(50),item_id int,transaction_type varchar(50),quantity int,transaction_date timestamp);
+
+INSERT INTO Roles (role_name, created_at) VALUES
+('Admin', NOW()),
+('Sales Manager', NOW()),
+('Inventory Manager', NOW());
+
+-- FUEL TYPES
+INSERT INTO fuel_types (fuel_id, fuelType_name, created_at) VALUES
+(1, 'Petrol', NOW()),
+(2, 'Diesel', NOW()),
+(3, 'Electric', NOW());
+
+INSERT INTO payments (payment_id, payment_type, created_at) VALUES
+(1, 'Cash', NOW()),
+(2, 'Credit Card', NOW()),
+(3, 'Bank Transfer', NOW());
+
+INSERT INTO customers (customer_id, name, contact_number, email, address, created_at) VALUES
+(1, 'Ravi Kumar', '9876543210', 'ravi.k@example.com', 'Mumbai, MH', NOW()),
+(2, 'Anjali Sharma', '9123456780', 'anjali.s@example.com', 'Pune, MH', NOW()),
+(3, 'John Dsouza', '9988776655', 'john.d@example.com', 'Goa, GA', NOW());
+
+INSERT INTO suppliers (supplier_id, supplier_name, contact_person, contact_number, email, address, created_at) VALUES
+(1, 'AutoWorld Supplies', 'Karan Patel', '9812345678', 'karan@autoworld.com', 'Mumbai, MH', NOW()),
+(2, 'Mega Motors', 'Suresh Reddy', '9823456789', 'suresh@megamotors.com', 'Hyderabad, TS', NOW());
+
+-- PURCHASE ORDERS
+INSERT INTO purchase_orders (order_id, supplier_id, order_date, total_amount, order_status) VALUES
+(1, 1, NOW(), 1500000.00, 'Completed'),
+(2, 2, NOW(), 500000.00, 'Pending');
+
+
+INSERT INTO users (user_id, username, password_hash, role_id, created_at) VALUES
+(1, 'admin_user', 'hash_admin', 1, NOW()),
+(2, 'sales_mngr', 'hash_sales', 2, NOW()),
+(3, 'inv_mngr', 'hash_inventory', 3, NOW());
+
+
+INSERT INTO vehicles (vehicle_id, model_name, brand, variant, fuel_id, price, stock_quantity, created_at) VALUES
+(1, 'Swift', 'Maruti', 'VXI', 1, 700000.00, 5, NOW()),
+(2, 'Innova', 'Toyota', 'ZX', 2, 2200000.00, 2, NOW()),
+(3, 'Nexon EV', 'Tata', 'XZ+', 3, 1500000.00, 3, NOW());
+
+INSERT INTO spare_parts (part_id, part_name, part_number, stock_quantity, reorder_level, supplier_id, created_at) VALUES
+(1, 'Brake Pad', 'BP-101', 50, 10, 1, NOW()),
+(2, 'Headlight', 'HL-202', 30, 5, 2, NOW());
+
+INSERT INTO sales (sale_id, customer_id, vehicle_id, sale_date, quantity, total_price, payment_id) VALUES
+(1, 1, 1, NOW(), 1, 700000.00, 1),
+(2, 2, 3, NOW(), 1, 1500000.00, 2);
+INSERT INTO sales (sale_id, customer_id, vehicle_id, sale_date, quantity, total_price, payment_id) VALUES
+(4,3,3,"2025-5-15",2,800000.00,2);
+INSERT INTO spare_parts_sales (sale_id, customer_id, part_id, sale_date, quantity, total_price) VALUES
+(1, 3, 1, NOW(), 2, 4000.00),
+(2, 1, 2, NOW(), 1, 5000.00);
+
+INSERT INTO invoices (invoice_id, order_id, sale_id, issue_date, amount, payment_status) VALUES
+(1, 1, 1, NOW(), 700000.00, 'Paid'),
+(2, 2, 2, NOW(), 1500000.00, 'Pending');
+
+INSERT INTO stock_transactions (transaction_id, item_type, item_id, transaction_type, quantity, transaction_date) VALUES
+(1, 'Vehicle', 1, 'Sale', 1, NOW()),
+(2, 'Vehicle', 3, 'Sale', 1, NOW()),
+(3, 'Spare Part', 1, 'Sale', 2, NOW());
+ 
